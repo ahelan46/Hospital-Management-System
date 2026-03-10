@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard — MedCore HMS{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_title %}Doctor Dashboard <span>Manage Appointments</span>{% endblock %}
+
+{% block content %}
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ total }}</h3>
+            <p>Total Appointments</p>
+        </div>
+        <div class="stat-icon primary">
+            <i class="bi bi-calendar2-week"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ approved }}</h3>
+            <p>Approved</p>
+        </div>
+        <div class="stat-icon success">
+            <i class="bi bi-check-circle"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ pending }}</h3>
+            <p>Pending Review</p>
+        </div>
+        <div class="stat-icon warning">
+            <i class="bi bi-hourglass-split"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ rejected }}</h3>
+            <p>Rejected</p>
+        </div>
+        <div class="stat-icon danger">
+            <i class="bi bi-x-circle"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Appointments Table -->
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="bi bi-clipboard2-pulse"></i> Patient Appointments</h3>
+    </div>
+
+    {% if appointments %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Token</th>
+                <th>Reason</th>
+                <th>Symptoms</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td>
+                    <strong>{{ appointment.patient.username }}</strong>
+                </td>
+                <td>{{ appointment.appointment_date }}</td>
+                <td>{{ appointment.slot.start_time|time:"h:i A" }} — {{ appointment.slot.end_time|time:"h:i A" }}</td>
+                <td>
+                    {% if appointment.status == "APPROVED" or appointment.status == "COMPLETED" %}
+                    {{ appointment.token_number }}
+                    {% elif appointment.status == "REJECTED" %}
+                    Null
+                    {% else %}
+                    --
+                    {% endif %}
+                </td>
+                <td>{{ appointment.reason|truncatewords:10 }}</td>
+                <td>{{ appointment.health_issue|default:"—" }}</td>
+                <td>
+                    {% if appointment.status == "APPROVED" %}
+                    <span class="badge badge-approved"><i class="bi bi-check-circle"></i> Approved</span>
+                    {% elif appointment.status == "PENDING" %}
+                    <span class="badge badge-pending"><i class="bi bi-hourglass"></i> Pending</span>
+                    {% elif appointment.status == "REJECTED" %}
+                    <span class="badge badge-rejected"><i class="bi bi-x-circle"></i> Rejected</span>
+                    {% elif appointment.status == "COMPLETED" %}
+                    <span class="badge badge-completed"><i class="bi bi-patch-check"></i> Completed</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if appointment.status == "PENDING" %}
+                    <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-lg"></i> Approve
+                    </a>
+                    <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger-outline btn-sm">
+                        <i class="bi bi-x-lg"></i> Reject
+                    </a>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 13px;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No appointments assigned yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

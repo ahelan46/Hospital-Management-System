@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Appointments — MedCore HMS{% endblock %}
+{% block nav_patient_appointments %}active{% endblock %}
+{% block page_title %}Patient Appointments <span>Manage Pending Requests</span>{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="bi bi-calendar-event"></i> Pending Appointments</h3>
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name..." value="{{ query }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table" id="appointmentsTable">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor Name</th>
+                    <th>Token</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Symptoms</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td class="patient-name"><strong>{{ appointment.patient.username }}</strong></td>
+                    <td>Dr. {{ appointment.doctor.user.username }}</td>
+                    <td class="text-muted">--</td>
+                    <td>{{ appointment.appointment_date }}</td>
+                    <td>{{ appointment.slot.start_time|time:"h:i A" }}</td>
+                    <td>{{ appointment.reason|truncatewords:10 }}</td>
+                    <td>{{ appointment.health_issue|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'approve_appointment' appointment.id %}" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-lg"></i> Approve
+                        </a>
+                        <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger-outline btn-sm">
+                            <i class="bi bi-x-lg"></i> Reject
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="bi bi-clipboard-x"></i>
+                        <p>No pending appointments found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if appointments.has_other_pages %}
+    <div class="pagination">
+        {% if appointments.has_previous %}
+        <a href="?page={{ appointments.previous_page_number }}{% if query %}&search={{ query }}{% endif %}"
+            class="page-link">&laquo; Previous</a>
+        {% endif %}
+
+        {% for i in appointments.paginator.page_range %}
+        {% if appointments.number == i %}
+        <span class="page-link active">{{ i }}</span>
+        {% else %}
+        <a href="?page={{ i }}{% if query %}&search={{ query }}{% endif %}" class="page-link">{{ i }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if appointments.has_next %}
+        <a href="?page={{ appointments.next_page_number }}{% if query %}&search={{ query }}{% endif %}"
+            class="page-link">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        color: var(--text-muted);
+    }
+
+    .search-box input {
+        padding: 8px 12px 8px 35px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        background: #f8fafc;
+        font-size: 14px;
+        width: 250px;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        border-color: var(--accent);
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        gap: 5px;
+    }
+
+    .page-link {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 14px;
+        transition: var(--transition);
+    }
+
+    .page-link:hover {
+        background: #f1f5f9;
+        border-color: var(--accent);
+    }
+
+    .page-link.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#appointmentsTable tbody tr:not(.empty-state-row)');
+
+        rows.forEach(row => {
+            let patientName = row.querySelector('.patient-name').textContent.toLowerCase();
+            if (patientName.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

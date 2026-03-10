@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments — MedCore HMS{% endblock %}
+{% block nav_my_appts %}active{% endblock %}
+{% block page_title %}My Appointments <span>Appointment History</span>{% endblock %}
+
+{% block content %}
+
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="bi bi-clock-history"></i> All Appointments</h3>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg"></i> New Appointment
+        </a>
+    </div>
+
+    {% if appointments %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Token</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td><strong>Dr. {{ appointment.doctor.user.username }}</strong></td>
+                <td>{{ appointment.doctor.specialization }}</td>
+                <td>
+                    {% if appointment.status == "APPROVED" or appointment.status == "COMPLETED" %}
+                    {{ appointment.token_number }}
+                    {% elif appointment.status == "REJECTED" %}
+                    Null
+                    {% else %}
+                    --
+                    {% endif %}
+                </td>
+                <td>{{ appointment.appointment_date }}</td>
+                <td>{{ appointment.slot.start_time|time:"h:i A" }} — {{ appointment.slot.end_time|time:"h:i A" }}</td>
+                <td>{{ appointment.reason|truncatewords:8 }}</td>
+                <td>
+                    {% if appointment.status == "APPROVED" %}
+                    <span class="badge badge-approved"><i class="bi bi-check-circle"></i> Approved</span>
+                    {% elif appointment.status == "PENDING" %}
+                    <span class="badge badge-pending"><i class="bi bi-hourglass"></i> Pending</span>
+                    {% elif appointment.status == "REJECTED" %}
+                    <span class="badge badge-rejected"><i class="bi bi-x-circle"></i> Rejected</span>
+                    {% elif appointment.status == "COMPLETED" %}
+                    <span class="badge badge-completed"><i class="bi bi-patch-check"></i> Completed</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if appointment.medical_report %}
+                    <a href="{% url 'view_medical_report' appointment.id %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-file-earmark-medical"></i> View Report
+                    </a>
+                    {% else %}
+                    <span class="text-muted small">No report</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-calendar-x"></i>
+        <p>You haven't booked any appointments yet.</p>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary" style="margin-top: 16px;">
+            <i class="bi bi-calendar-plus"></i> Book Your First Appointment
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Report — MedCore HMS{% endblock %}
+{% block nav_doctor_reports %}active{% endblock %}
+{% block page_title %}Manage Report <span>Patient: {{ appointment.patient.username }}</span>{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="form-header">
+        <h2>Medical Report & Prescriptions</h2>
+        <p>Appointment Date: {{ appointment.appointment_date }} | Reason: {{ appointment.reason }}</p>
+    </div>
+
+    <form method="POST" id="reportForm" class="form-body">
+        {% csrf_token %}
+
+        <!-- Medical Report Section -->
+        <h3 class="section-title"><i class="bi bi-file-earmark-text"></i> Health Assessment</h3>
+        <div class="form-group">
+            <label><i class="bi bi-activity"></i> Health Conditions</label>
+            <textarea name="health_conditions" class="form-control" rows="3"
+                placeholder="Enter patient health conditions...">{{ report.health_conditions|default:"" }}</textarea>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-info-circle"></i> Medical Details</label>
+            <textarea name="medical_details" class="form-control" rows="3"
+                placeholder="Enter further medical observations...">{{ report.medical_details|default:"" }}</textarea>
+        </div>
+
+        <!-- Prescription Section -->
+        <h3 class="section-title mt-4"><i class="bi bi-capsule-pill"></i> Prescriptions (Tablets)</h3>
+        <div id="tabletContainer">
+            {% for prescription in prescriptions %}
+            <div class="tablet-row card mb-3 p-3 bg-light rounded" data-index="{{ forloop.counter0 }}">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-4">
+                        <label class="small fw-bold">Tablet Name</label>
+                        <input type="text" name="tablet_name[]" value="{{ prescription.tablet_name }}"
+                            class="form-control" placeholder="Tablet Name" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold">Timing</label>
+                        <select name="timing[]" class="form-control" required>
+                            <option value="After Eating" {% if prescription.timing == 'After Eating' %}selected{% endif %}>
+                                After Eating
+                            </option>
+                            <option value="Before Eating" {% if prescription.timing == 'Before Eating' %}selected{% endif %}>
+                                Before Eating
+                            </option>
+                        </select>
+
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold d-block">Schedule</label>
+                        <div class="d-flex gap-3 mt-1">
+                            <label class="schedule-check"><input type="checkbox" name="morning_{{ forloop.counter0 }}"
+                                    {% if prescription.morning %}checked{% endif %}> Morn</label>
+                            <label class="schedule-check"><input type="checkbox" name="afternoon_{{ forloop.counter0 }}"
+                                    {% if prescription.afternoon %}checked{% endif %}> After</label>
+                            <label class="schedule-check"><input type="checkbox" name="night_{{ forloop.counter0 }}" {% if prescription.night %}checked{% endif %}> Night</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1 text-end mt-4">
+                        <button type="button" class="btn btn-danger-outline btn-sm remove-tablet"><i
+                                class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Initial Empty Row if no prescriptions exist -->
+            <div class="tablet-row card mb-3 p-3 bg-light rounded" data-index="0">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-4">
+                        <label class="small fw-bold">Tablet Name</label>
+                        <input type="text" name="tablet_name[]" class="form-control" placeholder="Tablet Name">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold">Timing</label>
+                        <select name="timing[]" class="form-control">
+                            <option value="After Eating">After Eating</option>
+                            <option value="Before Eating">Before Eating</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="small fw-bold d-block">Schedule</label>
+                        <div class="d-flex gap-3 mt-1">
+                            <label class="schedule-check"><input type="checkbox" name="morning_0"> Morn</label>
+                            <label class="schedule-check"><input type="checkbox" name="afternoon_0"> After</label>
+                            <label class="schedule-check"><input type="checkbox" name="night_0"> Night</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1 text-end mt-4">
+                        <button type="button" class="btn btn-danger-outline btn-sm remove-tablet"><i
+                                class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="addTablet" class="btn btn-outline btn-sm mb-4">
+            <i class="bi bi-plus-circle"></i> Add More Tablet
+        </button>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="form-submit">Update Report & Prescriptions</button>
+            <a href="{% url 'doctor_reports' %}" class="btn btn-outline mt-3 d-block text-center">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--accent-glow);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+
+    .mt-4 {
+        margin-top: 24px;
+    }
+
+    .mb-3 {
+        margin-bottom: 16px;
+    }
+
+    .bg-light {
+        background-color: #f8fafc;
+        border: 1px solid var(--card-border);
+    }
+
+    .p-3 {
+        padding: 16px;
+    }
+
+    .rounded {
+        border-radius: 10px;
+    }
+
+    .schedule-check {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .schedule-check input {
+        cursor: pointer;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+    }
+
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+        padding: 0 15px;
+    }
+
+    .col-md-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+        padding: 0 15px;
+    }
+
+    .col-md-1 {
+        flex: 0 0 8.333333%;
+        max-width: 8.333333%;
+        padding: 0 15px;
+    }
+
+    .g-3 {
+        --bs-gutter-y: 1rem;
+        --bs-gutter-x: 1rem;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+</style>
+
+<script>
+    document.getElementById('addTablet').addEventListener('click', function () {
+        const container = document.getElementById('tabletContainer');
+        const rows = container.querySelectorAll('.tablet-row');
+        const newIndex = rows.length > 0 ? parseInt(rows[rows.length - 1].getAttribute('data-index')) + 1 : 0;
+
+        const newRow = document.createElement('div');
+        newRow.className = 'tablet-row card mb-3 p-3 bg-light rounded';
+        newRow.setAttribute('data-index', newIndex);
+        newRow.innerHTML = `
+            <div class="row align-items-center g-3">
+                <div class="col-md-4">
+                    <label class="small fw-bold">Tablet Name</label>
+                    <input type="text" name="tablet_name[]" class="form-control" placeholder="Tablet Name" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Timing</label>
+                    <select name="timing[]" class="form-control" required>
+                        <option value="After Eating">After Eating</option>
+                        <option value="Before Eating">Before Eating</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="small fw-bold d-block">Schedule</label>
+                    <div class="d-flex gap-3 mt-1">
+                        <label class="schedule-check"><input type="checkbox" name="morning_${newIndex}"> Morn</label>
+                        <label class="schedule-check"><input type="checkbox" name="afternoon_${newIndex}"> After</label>
+                        <label class="schedule-check"><input type="checkbox" name="night_${newIndex}"> Night</label>
+                    </div>
+                </div>
+                <div class="col-md-1 text-end mt-4">
+                    <button type="button" class="btn btn-danger-outline btn-sm remove-tablet"><i class="bi bi-trash"></i></button>
+                </div>
+            </div>
+        `;
+        container.appendChild(newRow);
+        attachRemoveEvent(newRow.querySelector('.remove-tablet'));
+    });
+
+    function attachRemoveEvent(btn) {
+        btn.addEventListener('click', function () {
+            const container = document.getElementById('tabletContainer');
+            if (container.querySelectorAll('.tablet-row').length > 1) {
+                btn.closest('.tablet-row').remove();
+                reindexRows();
+            } else {
+                alert("At least one prescription row is required.");
+            }
+        });
+    }
+
+    function reindexRows() {
+        const rows = document.querySelectorAll('.tablet-row');
+        rows.forEach((row, index) => {
+            row.setAttribute('data-index', index);
+            row.querySelector('input[name^="morning_"]').setAttribute('name', `morning_${index}`);
+            row.querySelector('input[name^="afternoon_"]').setAttribute('name', `afternoon_${index}`);
+            row.querySelector('input[name^="night_"]').setAttribute('name', `night_${index}`);
+        });
+    }
+
+    document.querySelectorAll('.remove-tablet').forEach(attachRemoveEvent);
+</script>
+{% endblock %}

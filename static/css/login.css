@@ -1,0 +1,302 @@
+/* ============================================
+   MedCore HMS — Login Page Styles
+   ============================================ */
+
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------- Animated Gradient Background ---------- */
+body.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f2027);
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ---------- Floating Orbs (background decoration) ---------- */
+body.login-page::before,
+body.login-page::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+body.login-page::before {
+    width: 420px;
+    height: 420px;
+    background: #6c63ff;
+    top: -80px;
+    left: -120px;
+    animation: floatOrb1 8s ease-in-out infinite alternate;
+}
+
+body.login-page::after {
+    width: 350px;
+    height: 350px;
+    background: #00d2ff;
+    bottom: -60px;
+    right: -100px;
+    animation: floatOrb2 10s ease-in-out infinite alternate;
+}
+
+@keyframes floatOrb1 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+@keyframes floatOrb2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-50px, -30px) scale(1.1); }
+}
+
+/* ---------- Login Card (glassmorphism) ---------- */
+.login-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    padding: 48px 40px 40px;
+    animation: cardFadeIn 0.7s ease-out;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Brand Header ---------- */
+.login-brand {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.login-brand .brand-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #6c63ff, #00d2ff);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 18px rgba(108, 99, 255, 0.35);
+}
+
+.login-brand h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+}
+
+.login-brand p {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* ---------- Role Badges ---------- */
+.role-badges {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+
+.role-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.role-badge:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.role-badge.doctor  { border-color: rgba(108, 99, 255, 0.5); color: #a29bfe; }
+.role-badge.admin   { border-color: rgba(253, 203, 110, 0.5); color: #fdcb6e; }
+.role-badge.patient { border-color: rgba(0, 210, 255, 0.5); color: #74b9ff; }
+
+.role-badge.doctor:hover  { background: rgba(108, 99, 255, 0.15); color: #d0ccff; }
+.role-badge.admin:hover   { background: rgba(253, 203, 110, 0.15); color: #ffeaa7; }
+.role-badge.patient:hover { background: rgba(0, 210, 255, 0.15); color: #a8d8ff; }
+
+/* ---------- Form Controls ---------- */
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-group .input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 16px;
+    pointer-events: none;
+    transition: color 0.3s;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px 14px 46px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.form-group input:focus {
+    border-color: #6c63ff;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+}
+
+.form-group input:focus ~ .input-icon {
+    color: #6c63ff;
+}
+
+/* ---------- Submit Button ---------- */
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6c63ff, #3d5af1);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+/* sheen effect */
+.login-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+    transform: rotate(25deg);
+    transition: left 0.6s;
+}
+
+.login-btn:hover::after {
+    left: 125%;
+}
+
+/* ---------- Error / Messages ---------- */
+.login-errors {
+    background: rgba(255, 71, 87, 0.12);
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    animation: shakeError 0.4s ease;
+}
+
+.login-errors p,
+.login-errors li {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin: 0;
+    list-style: none;
+}
+
+@keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+}
+
+/* ---------- Footer ---------- */
+.login-footer {
+    text-align: center;
+    margin-top: 28px;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 12px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    .login-card {
+        margin: 20px;
+        padding: 36px 24px 28px;
+    }
+
+    .login-brand h1 {
+        font-size: 22px;
+    }
+
+    .role-badges {
+        gap: 6px;
+    }
+
+    .role-badge {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
