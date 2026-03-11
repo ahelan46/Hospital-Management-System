@@ -78,6 +78,10 @@ class TimeSlot(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
+<<<<<<< HEAD
+=======
+    capacity = models.PositiveIntegerField(default=1)
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
     is_booked = models.BooleanField(default=False)
 
     class Meta:
@@ -95,7 +99,10 @@ def create_time_slots(doctor, date, start_time, end_time, duration):
 
     start = datetime.combine(date, start_time)
     end = datetime.combine(date, end_time)
+<<<<<<< HEAD
     slots = []   # ✅ VERY IMPORTANT
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
     
     while start < end:
         slot_end = start + timedelta(minutes=duration)
@@ -106,15 +113,23 @@ def create_time_slots(doctor, date, start_time, end_time, duration):
             start_time=start.time(),
             defaults={
                 "end_time": slot_end.time(),
+<<<<<<< HEAD
                 "is_booked": False
+=======
+                "is_booked": False,
+                "capacity": doctor.max_patients_per_slot
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
             }
         )
 
         start = slot_end
 
+<<<<<<< HEAD
 
         TimeSlot.objects.bulk_create(slots, ignore_conflicts=True)
 
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
     
 class Appointment(models.Model):
 
@@ -139,12 +154,23 @@ class Appointment(models.Model):
 
     appointment_date = models.DateField()
     slot = models.ForeignKey(
+<<<<<<< HEAD
     'appointments.TimeSlot',
     on_delete=models.CASCADE,
     unique=True
     )
    
     reason = models.TextField()
+=======
+        'appointments.TimeSlot',
+        on_delete=models.CASCADE,
+        related_name='appointments'
+    )
+   
+    reason = models.TextField()
+    health_issue = models.CharField(max_length=255, blank=True, null=True)
+    token_number = models.PositiveIntegerField(blank=True, null=True)
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
     status = models.CharField(
         max_length=20,
@@ -156,6 +182,7 @@ class Appointment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+<<<<<<< HEAD
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -164,6 +191,8 @@ class Appointment(models.Model):
             )
         ]
 
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
     def clean(self):
         if self.patient == self.doctor:
             raise ValidationError("Doctor and patient cannot be the same.")
@@ -175,6 +204,7 @@ class Appointment(models.Model):
             raise ValidationError("Appointment date does not match slot date.")
 
     def save(self, *args, **kwargs):
+<<<<<<< HEAD
 
         from django.db import transaction
 
@@ -195,6 +225,34 @@ class Appointment(models.Model):
         self.slot.save(update_fields=['is_booked'])
 
         super().delete(*args, **kwargs)
+=======
+        from django.db import transaction
+
+        with transaction.atomic():
+            if not self.pk: # New appointment
+                current_bookings = self.slot.appointments.count()
+                if current_bookings >= self.slot.capacity:
+                    raise ValidationError("This slot has already reached its maximum capacity!")
+
+                self.full_clean()
+                super().save(*args, **kwargs)
+
+                # Update is_booked if capacity is now full
+                if self.slot.appointments.count() >= self.slot.capacity:
+                    self.slot.is_booked = True
+                    self.slot.save(update_fields=['is_booked'])
+            else:
+                super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        slot = self.slot
+        super().delete(*args, **kwargs)
+
+        # Check if slot should be marked as available again
+        if slot.appointments.count() < slot.capacity:
+            slot.is_booked = False
+            slot.save(update_fields=['is_booked'])
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
         
     def __str__(self):
         return f"{self.patient} → {self.doctor} ({self.appointment_date})"
@@ -202,6 +260,43 @@ class Appointment(models.Model):
     def appointment_time(self):
         return f"{self.slot.date} | {self.slot.start_time}"
 
+<<<<<<< HEAD
+=======
+class MedicalReport(models.Model):
+    appointment = models.OneToOneField(
+        'appointments.Appointment',
+        on_delete=models.CASCADE,
+        related_name='medical_report'
+    )
+    health_conditions = models.TextField(blank=True, null=True)
+    medical_details = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Report for {self.appointment.patient.username} - {self.appointment.appointment_date}"
+
+class Prescription(models.Model):
+    TIMING_CHOICES = (
+        ('Before Eating', 'Before Eating'),
+        ('After Eating', 'After Eating'),
+    )
+
+    report = models.ForeignKey(
+        MedicalReport,
+        on_delete=models.CASCADE,
+        related_name='prescriptions'
+    )
+    tablet_name = models.CharField(max_length=255)
+    timing = models.CharField(max_length=20, choices=TIMING_CHOICES)
+    morning = models.BooleanField(default=False)
+    afternoon = models.BooleanField(default=False)
+    night = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.tablet_name} for report {self.report.id}"
+
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
 
     

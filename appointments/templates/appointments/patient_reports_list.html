@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Reports — MedCore HMS{% endblock %}
+{% block nav_patient_reports %}active{% endblock %}
+{% block page_title %}Medical Reports <span>Secure access to your clinical records</span>{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="bi bi-file-earmark-medical"></i> Clinical Reports</h3>
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by doctor or assessment..." value="{{ query }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="reports-grid" id="reportsGrid">
+        {% for report in reports %}
+        <div class="report-list-item card mb-3">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div class="report-info">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="report-date badge badge-outline">{{ report.appointment.appointment_date }}</span>
+                        <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">{{
+                            report.appointment.token_number|default:"--" }}</span>
+                        <h4 class="m-0 doctor-name">Dr. {{ report.appointment.doctor.user.username }}</h4>
+                    </div>
+                    <p class="text-muted small m-0 assessment-preview">
+                        <strong>Assessment:</strong> {{ report.health_conditions|truncatewords:15 }}
+                    </p>
+                </div>
+                <div class="report-actions">
+                    <a href="{% url 'view_medical_report' report.appointment.id %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-eye"></i> View Detailed Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state w-100">
+            <i class="bi bi-file-earmark-x"></i>
+            <p>No medical reports found.</p>
+            <span class="text-muted small">Your clinical reports will appear here once your doctor updates them.</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if reports.has_other_pages %}
+    <div class="pagination">
+        {% if reports.has_previous %}
+        <a href="?page={{ reports.previous_page_number }}{% if query %}&search={{ query }}{% endif %}"
+            class="page-link">&laquo; Previous</a>
+        {% endif %}
+
+        {% for i in reports.paginator.page_range %}
+        {% if reports.number == i %}
+        <span class="page-link active">{{ i }}</span>
+        {% else %}
+        <a href="?page={{ i }}{% if query %}&search={{ query }}{% endif %}" class="page-link">{{ i }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if reports.has_next %}
+        <a href="?page={{ reports.next_page_number }}{% if query %}&search={{ query }}{% endif %}"
+            class="page-link">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .reports-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .report-list-item {
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        transition: var(--transition);
+        border-left: 4px solid var(--accent);
+    }
+
+    .report-list-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border-color: var(--accent);
+    }
+
+    .badge-outline {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    .doctor-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .assessment-preview {
+        font-size: 13px;
+        line-height: 1.4;
+        color: var(--text-muted);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        color: var(--text-muted);
+    }
+
+    .search-box input {
+        padding: 8px 12px 8px 35px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        background: #f8fafc;
+        font-size: 14px;
+        width: 280px;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        border-color: var(--accent);
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        gap: 5px;
+    }
+
+    .page-link {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 14px;
+        transition: var(--transition);
+    }
+
+    .page-link:hover {
+        background: #f1f5f9;
+        border-color: var(--accent);
+    }
+
+    .page-link.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.report-list-item');
+        items.forEach(item => {
+            let doctorName = item.querySelector('.doctor-name').textContent.toLowerCase();
+            let assessment = item.querySelector('.assessment-preview').textContent.toLowerCase();
+            item.style.display = (doctorName.includes(filter) || assessment.includes(filter)) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

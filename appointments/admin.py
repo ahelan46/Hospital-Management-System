@@ -49,10 +49,21 @@ def generate_slots(modeladmin, request, queryset):
 @admin.register(TimeSlot)
 class TimeSlotAdmin(admin.ModelAdmin):
 
+<<<<<<< HEAD
     list_display = ('doctor', 'date', 'start_time', 'is_booked')
     list_filter = ('is_booked', 'date')
     actions = [generate_slots]
 
+=======
+    list_display = ('doctor', 'date', 'start_time', 'capacity', 'get_booking_count', 'is_booked')
+    list_filter = ('is_booked', 'date')
+    actions = [generate_slots]
+
+    def get_booking_count(self, obj):
+        return obj.appointments.count()
+    get_booking_count.short_description = 'Bookings'
+
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
 # admin.site.register(TimeSlot, TimeSlotAdmin)
 

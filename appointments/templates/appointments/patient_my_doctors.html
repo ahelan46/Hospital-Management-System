@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}My Doctors — MedCore HMS{% endblock %}
+{% block nav_patient_doctors %}active{% endblock %}
+{% block page_title %}Consulting Physicians <span>Directory of doctors you've visited</span>{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <div class="section-header">
+        <h3><i class="bi bi-people"></i> My Consulting Team</h3>
+    </div>
+
+    <div class="doctors-dir-grid">
+        {% for doctor in doctors %}
+        <div class="doctor-dir-card">
+            <div class="doctor-avatar-large">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+            <div class="doctor-dir-info">
+                <h4>Dr. {{ doctor.user.username }}</h4>
+                <div class="spec-badge">{{ doctor.specialization }}</div>
+
+                <div class="doctor-stats-mini">
+                    <div class="mini-stat">
+                        <span class="label">Experience</span>
+                        <span class="value">{{ doctor.experience_years }} Years</span>
+                    </div>
+                </div>
+
+                <div class="doctor-contact-mini">
+                    <p><i class="bi bi-telephone"></i> {{ doctor.phone }}</p>
+                    <p><i class="bi bi-envelope"></i> {{ doctor.user.email|default:"Not shared" }}</p>
+                </div>
+            </div>
+            <div class="doctor-dir-action">
+                <a href="{% url 'book_appointment' %}" class="btn btn-outline btn-sm w-100">Book Follow-up</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state w-100">
+            <i class="bi bi-people"></i>
+            <p>No consulting doctors listed yet.</p>
+            <span class="text-muted small">Once your appointments are approved, your doctors will appear here.</span>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm mt-3">Find a Doctor</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .doctors-dir-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .doctor-dir-card {
+        background: #fff;
+        border: 1px solid var(--card-border);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .doctor-dir-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border-color: var(--accent);
+    }
+
+    .doctor-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: var(--accent-glow);
+        color: var(--accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        margin-bottom: 15px;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .doctor-dir-info h4 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .spec-badge {
+        display: inline-block;
+        padding: 4px 14px;
+        background: #e0f2fe;
+        color: #0369a1;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    .doctor-stats-mini {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 12px 0;
+        margin-bottom: 15px;
+    }
+
+    .mini-stat {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mini-stat .label {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .mini-stat .value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .doctor-contact-mini {
+        text-align: left;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .doctor-contact-mini p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .doctor-contact-mini i {
+        color: var(--accent);
+    }
+
+    .doctor-dir-action {
+        width: 100%;
+        margin-top: auto;
+    }
+</style>
+{% endblock %}

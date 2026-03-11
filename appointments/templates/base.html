@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,4 +24,160 @@
 </div>
 
 </body>
+=======
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedCore HMS{% endblock %}</title>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+
+<body>
+
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="brand-text">
+                <h2>MedCore</h2>
+                <span>HOSPITAL HMS</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">MAIN</div>
+
+            {% if user.role == 'DOCTOR' or user.role == 'Doctor' or user.role == 'doctor' or hasattr_doctor %}
+            <a href="{% url 'doctor_dashboard' %}" class="nav-link {% block nav_dashboard %}{% endblock %}">
+                <i class="bi bi-grid-1x2"></i> Dashboard
+            </a>
+            {% elif user.role == 'PATIENT' or user.role == 'Patient' or user.role == 'patient' or hasattr_patient %}
+            <a href="{% url 'patient_dashboard' %}" class="nav-link {% block nav_dashboard_patient %}{% endblock %}">
+                <i class="bi bi-grid-1x2"></i> Dashboard
+            </a>
+            {% elif user.is_staff or user.is_superuser %}
+            <a href="/admin/" class="nav-link">
+                <i class="bi bi-grid-1x2"></i> Admin Panel
+            </a>
+            {% endif %}
+
+            <div class="nav-section-title">APPOINTMENTS</div>
+
+            {% if user.role == 'PATIENT' or user.role == 'Patient' or user.role == 'patient' %}
+            <a href="{% url 'book_appointment' %}" class="nav-link {% block nav_book %}{% endblock %}">
+                <i class="bi bi-plus-circle"></i> Book Appointment
+            </a>
+            <a href="{% url 'my_appointments' %}" class="nav-link {% block nav_appointments %}{% endblock %}">
+                <i class="bi bi-clock-history"></i> View All Appointments
+            </a>
+            <a href="{% url 'patient_pending' %}" class="nav-link {% block nav_patient_pending %}{% endblock %}">
+                <i class="bi bi-hourglass"></i> Pending Appointments
+            </a>
+            <a href="{% url 'patient_approved' %}" class="nav-link {% block nav_patient_approved %}{% endblock %}">
+                <i class="bi bi-check-circle"></i> Approved Appointments
+            </a>
+            <a href="{% url 'patient_rejected' %}" class="nav-link {% block nav_patient_rejected %}{% endblock %}">
+                <i class="bi bi-x-circle"></i> Rejected Appointments
+            </a>
+            <!-- <a href="{% url 'my_appointments' %}" class="nav-link">
+                <i class="bi bi-calendar-event"></i> All Appointments
+            </a> -->
+
+            <div class="nav-section-title">MEDICAL RECORDS</div>
+            <a href="{% url 'patient_health_conditions' %}"
+                class="nav-link {% block nav_patient_health %}{% endblock %}">
+                <i class="bi bi-heart-pulse"></i> Health Conditions
+            </a>
+            <a href="{% url 'patient_medical_reports' %}"
+                class="nav-link {% block nav_patient_reports %}{% endblock %}">
+                <i class="bi bi-file-earmark-medical"></i> Medical Reports
+            </a>
+            <a href="{% url 'patient_my_doctors' %}" class="nav-link {% block nav_patient_doctors %}{% endblock %}">
+                <i class="bi bi-person-badge"></i> My Doctors
+            </a>
+            {% elif user.role == 'DOCTOR' or user.role == 'Doctor' or user.role == 'doctor' %}
+            <a href="{% url 'doctor_appointments' %}"
+                class="nav-link {% block nav_patient_appointments %}{% endblock %}">
+                <i class="bi bi-calendar-event"></i> Patient Appointment
+            </a>
+            <a href="{% url 'doctor_approved' %}" class="nav-link {% block nav_doctor_approved %}{% endblock %}">
+                <i class="bi bi-check-circle"></i> Patient Approved
+            </a>
+            <a href="{% url 'doctor_rejected' %}" class="nav-link {% block nav_doctor_rejected %}{% endblock %}">
+                <i class="bi bi-x-circle"></i> Patient Rejected
+            </a>
+            <a href="{% url 'doctor_reports' %}" class="nav-link {% block nav_doctor_reports %}{% endblock %}">
+                <i class="bi bi-file-earmark-medical"></i> Reports
+            </a>
+            <!-- <a href="{% url 'doctor_dashboard' %}" class="nav-link {% block nav_manage %}{% endblock %}">
+                <i class="bi bi-collection"></i> Manage Overview
+            </a> -->
+            {% endif %}
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user-card">
+                <div class="user-avatar-small">
+                    {{ user.username|first|upper }}
+                </div>
+                <div class="user-display-name">{{ user.username }}</div>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-link">
+                <i class="bi bi-box-arrow-left"></i> Log Out
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <div class="page-title">
+                {% block page_title %}Dashboard{% endblock %}
+            </div>
+            <div class="topbar-actions">
+                <div class="topbar-badge">
+                    <i class="bi bi-person"></i>
+                    {{ user.role }}
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                <i
+                    class="bi {% if message.tags == 'success' %}bi-check-circle{% else %}bi-exclamation-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+</body>
+
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 </html>

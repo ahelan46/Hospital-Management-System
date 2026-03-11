@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+<<<<<<< HEAD
 import os
 import dj_database_url
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,6 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@e-0q)@x2pv#66il^d31myi+&7t3q214a@q^+g(f_^u1%t@=bt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+<<<<<<< HEAD
 DEBUG = 'RENDER_EXTERNAL_HOSTNAME' not in os.environ
 
 ALLOWED_HOSTS = []
@@ -39,6 +43,16 @@ LOGIN_REDIRECT_URL = '/appointments/book/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/redirect-dashboard/'
 LOGIN_REDIRECT_URL = '/appointments/redirect-dashboard/'
+=======
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+AUTH_USER_MODEL = 'accounts.User'
+
+LOGIN_REDIRECT_URL = '/appointments/redirect-dashboard/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
 # Application definition
 
@@ -61,7 +75,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+<<<<<<< HEAD
     'whitenoise.middleware.WhiteNoiseMiddleware',
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,6 +99,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+<<<<<<< HEAD
+=======
+                'appointments.context_processors.sidebar_context',
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
             ],
         },
     },
@@ -104,9 +125,12 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
 
+=======
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -143,7 +167,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+<<<<<<< HEAD
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+=======
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc

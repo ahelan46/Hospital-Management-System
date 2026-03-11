@@ -16,6 +16,10 @@ class Doctor(models.Model):
     phone = models.CharField(max_length=15)
 
     is_available = models.BooleanField(default=True)
+<<<<<<< HEAD
+=======
+    max_patients_per_slot = models.PositiveIntegerField(default=1)
+>>>>>>> 3475266f108007b774f3a8cd5bbf15ec29df5ffc
 
     joined_at = models.DateTimeField(auto_now_add=True)
 
