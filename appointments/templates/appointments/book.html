@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | Central Hospital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+
+        /* Custom Styles for Central Hospital Appointment Form */
+
+:root {
+    --primary-blue: #2563eb;
+    --hover-blue: #1d4ed8;
+    --glass-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* Base Body Styling */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.05) 0px, transparent 50%);
+}
+
+/* Glassmorphism Card Effect */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Form Element Focus States */
+select:focus, 
+textarea:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    background-color: #ffffff;
+}
+
+/* Custom Scrollbar for Textarea */
+textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 10px;
+}
+
+/* Animation for Success/Info Messages */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-animate {
+    animation: slideInUp 0.4s ease-out forwards;
+}
+
+/* Button Active State Feedback */
+button:active {
+    transform: scale(0.98);
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+    .glass-card {
+        margin: 1rem;
+        border-radius: 1rem;
+    }
+}
+
+
+/* Force select text to be visible */
+select, select option {
+    color: #111827 !important; /* Tailwind's gray-900 */
+    background-color: #ffffff !important;
+}
+
+/* Style for the placeholder (disabled option) */
+select:invalid, select option[value=""] {
+    color: #9ca3af !important; /* Tailwind's gray-400 */
+}
+
+/* Force Practitioner Names and Slot text to be visible */
+select#doctorSelect, 
+select#slotSelect,
+select option {
+    color: #111827 !important; /* Tailwind's gray-900 (Near Black) */
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #111827 !important; /* Fix for Safari/iOS */
+}
+
+/* Style the placeholder specifically */
+select:invalid, 
+select option[value=""] {
+    color: #6b7280 !important; /* Tailwind's gray-500 */
+}
+
+/* Ensure the label above the select is also sharp */
+label {
+    color: #374151 !important; /* Tailwind's gray-700 */
+    letter-spacing: 0.025em;
+}
+
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+
+    <div class="max-w-2xl w-full glass-card rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
+        <div class="bg-blue-600 p-8 text-white text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
+                <i class="fas fa-calendar-check text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold tracking-tight">Schedule Consultation</h2>
+            <p class="text-blue-100 mt-2 font-light">Secure your appointment with our specialized medical team.</p>
+        </div>
+
+        <div class="p-8">
+            <form method="POST" id="appointmentForm" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="flex items-center text-sm font-bold text-gray-700">
+                            <i class="fas fa-user-md mr-2 text-blue-500"></i> Select Practitioner
+                        </label>
+                        <select id="doctorSelect" name="doctor" required 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <option value="" disabled selected>Choose a physician...</option>
+                            {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}">
+                                    Dr. {{ doctor.user.username }} - {{ doctor.specialization }}
+                                </option>
+                            {% empty %}
+                                <option value="" disabled>No doctors currently available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="flex items-center text-sm font-bold text-gray-700">
+                            <i class="fas fa-clock mr-2 text-blue-500"></i> Available Time
+                        </label>
+                        <select id="slotSelect" name="slot" required 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <option value="" disabled selected>Select a doctor first...</option>
+                            {% for slot in slots %}
+                                <option value="{{ slot.id }}" data-doctor="{{ slot.doctor.id }}">
+                                    {{ slot.doctor.username }} | {{ slot.date }} | {{ slot.start_time }}
+                                </option>
+                            {% empty %}
+                                <option value="" disabled>No available time slots found</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-bold text-gray-700">
+                        <i class="fas fa-notes-medical mr-2 text-blue-500"></i> Reason for Visit
+                    </label>
+                    <textarea name="reason" rows="4" required
+                        placeholder="Please describe your symptoms or the purpose of your visit..." 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all resize-none"></textarea>
+                    <p class="text-xs text-gray-400 italic">Information shared is strictly confidential.</p>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-200 transition duration-300 transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center space-x-2">
+                        <span>Confirm Appointment</span>
+                        <i class="fas fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+            </form>
+
+            {% if messages %}
+            <div class="mt-8 space-y-3">
+                {% for message in messages %}
+                    <div class="flex items-center p-4 rounded-xl text-sm border 
+                        {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200{% else %}bg-amber-50 text-amber-800 border-amber-200{% endif %} animate-pulse">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-3"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-gray-50 p-4 border-t border-gray-100 text-center">
+            <p class="text-xs text-gray-500">Need urgent help? Call Emergency at <strong>(555) 000-9999</strong></p>
+        </div>
+    </div>
+
+    <script>
+        const doctorSelect = document.getElementById('doctorSelect');
+        const slotSelect = document.getElementById('slotSelect');
+        const allSlots = Array.from(slotSelect.options);
+
+        doctorSelect.addEventListener('change', function() {
+            const selectedDoctorId = this.value;
+            
+            // Reset slot selection
+            slotSelect.value = "";
+            slotSelect.innerHTML = '<option value="" disabled selected>Choose a time slot...</option>';
+
+            // Filter and append slots belonging to the doctor
+            const filteredSlots = allSlots.filter(opt => opt.dataset.doctor === selectedDoctorId);
+            
+            if (filteredSlots.length > 0) {
+                filteredSlots.forEach(opt => {
+                    opt.classList.remove('hidden');
+                    slotSelect.appendChild(opt);
+                });
+            } else {
+                const noSlotOpt = document.createElement('option');
+                noSlotOpt.text = "No slots available for this doctor";
+                noSlotOpt.disabled = true;
+                slotSelect.appendChild(noSlotOpt);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<a href="{% url 'my_appointments' %}">My Appointments</a>
+
+{% for appointment in appointments %}
+    <div>
+        Doctor: {{ appointment.doctor }}
+        Date: {{ appointment.appointment_date }}
+        Time: {{ appointment.slot.start_time }} - {{ appointment.slot.end_time }}
+        Reason: {{ appointment.reason }}
+    </div>
+{% empty %}
+    <p>No appointments found.</p>
+{% endfor %}

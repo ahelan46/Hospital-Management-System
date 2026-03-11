@@ -1,0 +1,27 @@
+<h2>Doctor Dashboard</h2>
+<a href="{% url 'logout' %}?next=/some/other/page/" style="float: right;color: black;">Logout</a>
+
+<div style="display:flex; gap:20px;">
+    <div>Total: {{ total }}</div>
+    <div>Approved: {{ approved }}</div>
+    <div>Pending: {{ pending }}</div>
+    <div>Rejected: {{ rejected }}</div>
+</div>
+<hr>
+{% for appointment in appointments %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <p><strong>Patient:</strong> {{ appointment.patient.username }}</p>
+        <p><strong>Date:</strong> {{ appointment.appointment_date }}</p>
+        <p><strong>Time:</strong> {{ appointment.slot.start_time }} - {{ appointment.slot.end_time }}</p>
+        <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+        <p><strong>Status:</strong> {{ appointment.status }}</p>
+
+        {% if appointment.status == "PENDING" %}
+            <a href="{% url 'approve_appointment' appointment.id %}">Approve</a>
+            |
+            <a href="{% url 'reject_appointment' appointment.id %}">Reject</a>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>No appointments yet.</p>
+{% endfor %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Patient Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-primary p-3">
+            <h5>Total</h5>
+            <h3>{{ total }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-success p-3">
+            <h5>Approved</h5>
+            <h3>{{ approved }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-warning p-3">
+            <h5>Pending</h5>
+            <h3>{{ pending }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-bg-danger p-3">
+            <h5>Rejected</h5>
+            <h3>{{ rejected }}</h3>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h4>Your Appointments</h4>
+
+{% if appointments %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for appointment in appointments %}
+        <tr>
+            <td>{{ appointment.doctor.username }}</td>
+            <td>{{ appointment.appointment_date }}</td>
+            <td>{{ appointment.slot.start_time }} - {{ appointment.slot.end_time }}</td>
+            <td>{{ appointment.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No appointments booked yet.</p>
+{% endif %}
+
+{% endblock %}
