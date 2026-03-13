@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-@e-0q)@x2pv#66il^d31myi+&7t3q214a@q^+g(f_^u1%t@=bt
 <<<<<<< HEAD
 DEBUG = 'RENDER_EXTERNAL_HOSTNAME' not in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 
 if RENDER_EXTERNAL_HOSTNAME:
@@ -169,6 +169,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 <<<<<<< HEAD
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
